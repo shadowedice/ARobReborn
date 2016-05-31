@@ -1,6 +1,6 @@
 import urllib.request as ur
 import re
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 
 def mana_convert(text):
     if(text == 'Blue'):
@@ -42,8 +42,9 @@ def card_text(text):
         for text in value.find_all('div', class_="cardtextbox"):
             ret += "\n"
             for fields in text.descendants:
-                if not isinstance(fields, str):
-                    ret += "%s" % mana_convert(fields['alt'])
+                if isinstance(fields, Tag):
+                    if fields.has_attr('alt'):
+                        ret += "%s" % mana_convert(fields['alt'])
                 else:
                     ret += fields
             
