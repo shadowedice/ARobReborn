@@ -18,15 +18,16 @@ def mana_convert(text):
 
 def card_check(card):
     try:
-        #page = ur.urlopen("http://gatherer.wizards.com/Pages/Search/Default.aspx?name=%s" % card.replace("&", "%26")).read().decode('utf-8')
+        card = ur.quote(card)
         page = ur.urlopen("http://gatherer.wizards.com/Pages/Card/Details.aspx?name=%s" % card.replace("&", "%26")).read().decode('utf-8')
         return re.search('multiverseid=([0-9]*)', page).group(1)
     except AttributeError:
         print ("ERROR")
         return False
 		
-def card_text(text):
-    page = ur.urlopen(text).read()
+def card_text(card_id):
+    link = "http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=%s" % card_id
+    page = ur.urlopen(link).read()
     
     soup = BeautifulSoup(page, 'html.parser')
     ret = ""
@@ -56,5 +57,21 @@ def card_text(text):
             if(not value.find('img')):
                 ret += " %s" %value.get_text().strip()
         ret += "\n"
+    return ret
+    
+def card_image(card_id):
+    link = "http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=%s&type=card" % card_id
+    imgname = "mtgcard.jpg"
+    ur.urlretrieve(link, imgname)
+    print (link)
+    print (imgname)
+    return imgname
+    
+def card_price(card_id):
+    ret = "---------------------------------\n"
+    ret += "TCG Low: Working on retrieving prices\n"
+    ret += "TCG Mid: Working on retrieving prices\n"
+    ret += "TCG High: Working on retrieving prices\n"
+    ret += "---------------------------------"
     return ret
     

@@ -1,6 +1,5 @@
 import discord
 import re
-import urllib.request as ur
 import MagicCard
 import Token
 
@@ -14,22 +13,31 @@ async def on_message(message):
 			
     if message.content.startswith('$alex'):
          await client.send_message(message.channel, 'Alex does suck dick legit.')
-		 
-	#Magic card parsing portion	 
-    cards = re.findall("\[\[([^\[\]]*)\]\]", message.content)
     
-    if len(cards) > 10: cards = cards[0:10]
-    for i in set(cards):
-        print (i);
-        j = ur.quote(i)
-        card_id = MagicCard.card_check(j)
+    elif message.content.startswith('$mtgcard'):
+        card_id = MagicCard.card_check(message.content[9:])
         if card_id:
-            # Builds the post
-            imgurl = "http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=%s&type=card&.jpg" % (card_id)
-            #imgname = "mtgimgs/" + card_id + ".jpg"
-            imgname = "mtgcard.jpg"
-            ur.urlretrieve(imgurl, imgname)
-            reply = MagicCard.card_text("http://gatherer.wizards.com/Pages/Card/Details.aspx?name=%s" % j)
+            imgname = MagicCard.card_image(card_id)
+            await client.send_file(message.channel, imgname)
+        
+    elif message.content.startswith('$mtgtext'):
+        card_id = MagicCard.card_check(message.content[9:])
+        if card_id:
+            text = MagicCard.card_text(card_id)
+            await client.send_message(message.channel, text)
+        
+    elif message.content.startswith('$mtgprice'):
+        card_id = MagicCard.card_check(message.content[10:])
+        if card_id:
+            price = MagicCard.card_price(card_id)
+            await client.send_message(message.channel, price)
+        
+    elif message.content.startswith('$mtg'):
+        card_id = MagicCard.card_check(message.content[5:])
+        if card_id:
+            reply = MagicCard.card_text(card_id)
+            reply += MagicCard.card_price(card_id)
+            imgname = MagicCard.card_image(card_id)
             await client.send_file(message.channel, imgname, content=reply)
 
 
