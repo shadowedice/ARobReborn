@@ -1,5 +1,4 @@
 import discord
-import re
 import MagicCard
 import Token
 
@@ -14,8 +13,8 @@ async def on_message(message):
     if message.content.startswith('$alex'):
          await client.send_message(message.channel, 'Alex does suck dick legit.')
     
-    elif message.content.startswith('$mtgcard'):
-        card_id = MagicCard.card_check(message.content[9:])
+    elif message.content.startswith('$mtgimage'):
+        card_id = MagicCard.card_check(message.content[10:])
         if card_id:
             imgname = MagicCard.card_image(card_id)
             await client.send_file(message.channel, imgname)
