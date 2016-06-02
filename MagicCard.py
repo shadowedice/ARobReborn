@@ -18,8 +18,7 @@ def mana_convert(text):
 
 def card_check(card):
     try:
-        card = ur.quote(card)
-        page = ur.urlopen("http://gatherer.wizards.com/Pages/Card/Details.aspx?name=%s" % card.replace("&", "%26")).read().decode('utf-8')
+        page = ur.urlopen("http://gatherer.wizards.com/Pages/Card/Details.aspx?name=%s" % ur.quote(card)).read().decode('utf-8')
         return re.search('multiverseid=([0-9]*)', page).group(1)
     except AttributeError:
         print ("ERROR")
@@ -65,11 +64,19 @@ def card_image(card_id):
     ur.urlretrieve(link, imgname)
     return imgname
     
-def card_price(card_id):
-    ret = "---------------------------------\n"
-    ret += "TCG Low: Working on retrieving prices\n"
-    ret += "TCG Mid: Working on retrieving prices\n"
-    ret += "TCG High: Working on retrieving prices\n"
-    ret += "---------------------------------"
+def card_price(card):
+    fmtName = ur.quote('+'.join(card.split(' ')), '/+')
+    link = 'http://www.mtgstocks.com/cards/search?utf8=%E2%9C%93&print%5Bcard%5D={}&button='.format(fmtName)
+    page = ur.urlopen(link).read()
+    soup = BeautifulSoup(page, 'html.parser')
+    
+    if soup.find('td', class_="lowprice") is None:
+        ret = "No pricing data found"
+    else:
+        ret = "---------------------------------\n"
+        ret += "MTGStocks High: " + soup.find('td', class_="highprice").get_text() + "\n"
+        ret += "MTGStocks Average: " + soup.find('td', class_="avgprice").get_text() + "\n"
+        ret += "MTGStocks Low: " + soup.find('td', class_="lowprice").get_text() + "\n"
+        ret += "---------------------------------"
     return ret
     
